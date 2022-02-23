@@ -5,6 +5,7 @@ import {
   doc,
   getDoc,
   setDoc,
+  writeBatch,
 } from "firebase/firestore";
 
 import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
@@ -25,6 +26,7 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
+
 export const auth = getAuth(app);
 
 const provider = new GoogleAuthProvider();
@@ -34,7 +36,7 @@ const db = getFirestore();
 export const createUserProfileDocument = async (userAuth, additionalData) => {
   if (!userAuth) return;
 
-  const userRef = doc(db, "users", userAuth.uid);
+  const userRef = await doc(db, "users", userAuth.uid);
   const snapShot = await getDoc(userRef);
 
   // Add a new document in collection "users"
@@ -43,7 +45,7 @@ export const createUserProfileDocument = async (userAuth, additionalData) => {
     const createdAt = new Date();
 
     try {
-      await setDoc(doc(db, "users", userAuth.uid), {
+      await setDoc(userRef, {
         displayName,
         email,
         createdAt,
@@ -59,6 +61,7 @@ export const createUserProfileDocument = async (userAuth, additionalData) => {
 export const signInWithGoogle = () =>
   signInWithPopup(auth, provider)
     .then((result) => {
+      console.log(result, 'google sign in')
       // This gives you a Google Access Token. You can use it to access the Google API.
       // const credential = GoogleAuthProvider.credentialFromResult(result);
       // const token = credential.accessToken;
@@ -67,6 +70,7 @@ export const signInWithGoogle = () =>
       // ...
     })
     .catch((error) => {
+      console.log(error,'error sign in with google')
       // Handle Errors here.
       // const errorCode = error.code;
       // const errorMessage = error.message;
@@ -76,3 +80,40 @@ export const signInWithGoogle = () =>
       // const credential = GoogleAuthProvider.credentialFromError(error);
       // ...
     });
+
+export const addCollectionAndDocuments = async(collectionKey, objectsToAdd) => {
+
+  // const collectionRef = collection(db, collectionKey);
+  // console.log(collectionRef.path)
+  // console.log(await doc(db, collectionKey, ''), 'ref');
+  // console.log(objectsToAdd, 'ddd')
+  const batch = writeBatch(db);
+
+  await objectsToAdd.forEach(async (obj) => {
+    console.log(obj.title.toLowerCase())
+    let id = obj.title.toLowerCase();
+    const newDocRef = await doc(db, collectionKey, id);
+    console.log({newDocRef}, 'ref');
+    await batch.set(newDocRef, obj)
+  })
+
+  return await batch.commit();
+}
+
+
+export const convertCollectionsSnapshotToMap = (collections) => {
+  const transformedCollection = collections.docs.map(doc => {
+    const { title, items } = doc.data()
+    return {
+      routeName : encodeURI(title.toLowerCase()),
+      id : doc.id,
+      title,
+      items,
+    }
+  }) 
+  
+  return transformedCollection.reduce((a, collection) => {
+    a[collection.title.toLowerCase()] = collection;
+    return a;
+  } ,{});
+};
