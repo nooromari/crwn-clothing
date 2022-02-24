@@ -1,53 +1,63 @@
-import { collection, doc, getFirestore, onSnapshot } from "firebase/firestore";
+// import { collection, doc, getFirestore, onSnapshot } from "firebase/firestore";
 import React from "react";
 import { Route } from "react-router";
 import { connect } from "react-redux";
+import { createStructuredSelector } from "reselect";
 
-import { convertCollectionsSnapshotToMap } from "../../firebase/firebase.utils";
-import { updateCollections } from "../../redux/shop/shop.actions";
+// import { convertCollectionsSnapshotToMap } from "../../firebase/firebase.utils";
+import { fetchCollectionsStartAsync } from "../../redux/shop/shop.actions";
+import { selectIsCollectionFetching, selectIsCollectionsLoaded } from "../../redux/shop/shop.selectors";
 
-import CollectionOverView from "../../components/collections-overview/collections-overview.component";
 import CollectionPage from "../collection/collection.component";
 import WithSpinner from "../../components/with-spinner/with-spinner.component";
+import CollectionsOverViewContainer from "../../components/collections-overview/collections-overview.container";
+import CollectionPageContainer from "../collection/collection.container";
 
-const CollectionOverViewWithSpinner = WithSpinner(CollectionOverView);
-const CollectionPageWithSpinner = WithSpinner(CollectionPage);
+// const CollectionPageWithSpinner = WithSpinner(CollectionPage);
 
 class ShopPage extends React.Component {
-  state = {
-    loading: true,
-  };
+  // state = {
+  //   loading: true,
+  // };
 
-  unsubscribeFromSnapshot = null;
+  // unsubscribeFromSnapshot = null;
 
-  componentDidMount() {
-    const { updateCollections } = this.props;
-    const db = getFirestore();
-    onSnapshot(collection(db, "collections"), (snapshot) => {
-      const collecttionsMap = convertCollectionsSnapshotToMap(snapshot);
-      updateCollections(collecttionsMap);
-      this.setState({ loading: false });
-    });
+  async componentDidMount() {
+    const { fetchCollectionsStartAsync } = this.props;
+    await fetchCollectionsStartAsync();
+    // const { updateCollections } = this.props;
+    // const db = getFirestore();
+    // onSnapshot(collection(db, "collections"), (snapshot) => {
+    //   const collecttionsMap = convertCollectionsSnapshotToMap(snapshot);
+    //   updateCollections(collecttionsMap);
+    //   this.setState({ loading: false });
+    // });
+    // collection(db, "collections").then(res => console.log(res,'reees'))
   }
 
   render() {
-    const { match } = this.props;
-    const { loading } = this.state;
+    const { match, isCollectionsLoaded } = this.props;
+    // const { loading } = this.state;
+
     return (
       <div className="shop-page">
-        <Route exact path={`${match.path}`} render={(props) => <CollectionOverViewWithSpinner isLoading={loading} {...props} />} />
+        <Route exact path={`${match.path}`} component={CollectionsOverViewContainer} />
         <Route
           path={`${match.path}/:collectionId`}
-          render={(props) => <CollectionPageWithSpinner isLoading={loading} {...props} />}
+          component={CollectionPageContainer}
         />
       </div>
     );
   }
 }
 
+const mapStateToProps = createStructuredSelector({
+  // isCollectionFetching : selectIsCollectionFetching,
+  // isCollectionsLoaded : selectIsCollectionsLoaded
+})
+
 const mapDispatchToProps = (dispatch) => ({
-  updateCollections: (collecttionsMap) =>
-    dispatch(updateCollections(collecttionsMap)),
+  fetchCollectionsStartAsync : () => dispatch(fetchCollectionsStartAsync())
 });
 
-export default connect(null, mapDispatchToProps)(ShopPage);
+export default connect(mapStateToProps, mapDispatchToProps)(ShopPage);

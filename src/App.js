@@ -51,7 +51,8 @@ class App extends React.Component {
   }
 
   render() {
-    return (
+    const { currentUser } = this.props;
+    return ( 
       <div className="App">
         <Header />
         <Switch>
@@ -62,7 +63,7 @@ class App extends React.Component {
             path="/signin"
             exact
             render={() =>
-              this.props.currentUser ? <Redirect to="/" /> : <SingInAndSignUp />
+              currentUser ? <Redirect to="/" /> : <SingInAndSignUp />
             }
           />
         </Switch>
@@ -73,7 +74,6 @@ class App extends React.Component {
 
 const mapStateToProps = createStructuredSelector({
   currentUser: setCurrentUser,
-  // collectionsArray: selectCollectionForPreview,
 });
 
 const mapDispatchToProps = (dispatch) => ({
