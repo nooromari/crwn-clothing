@@ -20,8 +20,8 @@ app.use(compression());
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
 
-// if (process.env.NODE_ENV === 'production'){
-    app.use(express.static(path.json(__dirname, 'client/build')));
+if (process.env.NODE_ENV === 'production'){
+    // app.use(express.static(path.json(__dirname, 'client/build')));
     app.use(express.static('client/public'))
 
 
@@ -29,7 +29,7 @@ app.use(bodyParser.urlencoded({ extended: true }))
         // res.sendFile(path.join(__dirname, 'client/build', 'index.html'))
         app.use(express.static('client/public'))
     });
-// }
+}
 
 app.listen(port, error => {
     if (error) throw error;
