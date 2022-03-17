@@ -32,6 +32,10 @@ const googleSignInStyles = css`
     background-color: #357ae8;
     border: none;
   }
+
+  @media screen and (max-width: 800px){
+    padding: 0px;
+  }
 `;
 
 const getButtonStyles = (props) => {
@@ -48,7 +52,7 @@ export const CustomButtonContainer = styled.button`
   height: 50px;
   letter-spacing: 0.5px;
   line-height: 50px;
-  padding: 0 35px 0 35px;
+  padding: 0 35px;
   font-size: 15px;
   text-transform: uppercase;
   font-family: "Open Sans Condensed";
@@ -56,6 +60,11 @@ export const CustomButtonContainer = styled.button`
   cursor: pointer;
   display: flex;
   justify-content: center;
+
+  @media screen and (max-width: 800px){
+    min-width: 100px;
+    padding: 0 10px;
+  }
 
   ${getButtonStyles}
 `;

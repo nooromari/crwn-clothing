@@ -15,7 +15,11 @@
         width: 100%;
         height: 100%;
       }
+      @media screen and (max-width: 800px){
+        width: 30%;
+      }
     }
+
     .name,
     .quantity,
     .price {
@@ -32,10 +36,15 @@
       .value{
         margin: 0 10px;
       }
+
     }
   
     .remove-button {
       padding-left: 12px;
       cursor: pointer;
+    }
+
+    @media screen and (max-width: 800px){
+      font-size: small;
     }
   }
