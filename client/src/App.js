@@ -1,20 +1,22 @@
 import { Route, Switch, Redirect } from "react-router";
-import React, { useEffect } from "react";
+import React, { useEffect, lazy, Suspense } from "react";
 // import "./App.css";
 
 import { GlobalStyle } from "./global.styles";
 
-import HomePage from "./pages/homepage/homePage.component";
-import ShopPage from "./pages/shop/shop.component";
-import SingInAndSignUp from "./pages/sign-in-and-sign-up/sign-in-and-sign-up.component";
 import Header from "./components/header/header.component";
-import CheckoutPage from "./pages/checkout/checkout.component";
+import Spinner from "./components/spinner/spinner.component";
 
 import { auth, createUserProfileDocument } from "./firebase/firebase.utils";
 import { onSnapshot } from "firebase/firestore";
 
 import { connect } from "react-redux";
 import { setCurrentUser } from "./redux/user/user.actions";
+
+const HomePage = lazy(() => import("./pages/homepage/homePage.component"));
+const ShopPage = lazy(() => import("./pages/shop/shop.component"));
+const SingInAndSignUp = lazy(() => import("./pages/sign-in-and-sign-up/sign-in-and-sign-up.component"));
+const CheckoutPage = lazy(() => import("./pages/checkout/checkout.component"));
 
 const App = ({ currentUser, setCurrentUser }) => {
   useEffect(() => {
@@ -40,16 +42,18 @@ const App = ({ currentUser, setCurrentUser }) => {
       <GlobalStyle />
       <Header />
       <Switch>
-        <Route exact path="/" component={HomePage} />
-        <Route path="/shop" component={ShopPage} />
-        <Route exact path="/checkout" component={CheckoutPage} />
-        <Route
-          path="/signin"
-          exact
-          render={() =>
-            currentUser ? <Redirect to="/" /> : <SingInAndSignUp />
-          }
-        />
+        <Suspense fallback={<Spinner />}>
+          <Route exact path="/" component={HomePage} />
+          <Route path="/shop" component={ShopPage} />
+          <Route exact path="/checkout" component={CheckoutPage} />
+          <Route
+            path="/signin"
+            exact
+            render={() =>
+              currentUser ? <Redirect to="/" /> : <SingInAndSignUp />
+            }
+            />
+        </Suspense>
       </Switch>
     </div>
   );
