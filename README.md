@@ -32,6 +32,7 @@ E-commerce web application for clothes, Where you can browse the clothes by the 
     - SCSS/SASS
     - Styled component
     - Heroku (deployment)
+    - PWA
 
 <!-- ## Change Log -->
 <!-- Use this area to document the iterative changes made to your application as each feature is successfully implemented. Use time stamps. Here's an examples:
